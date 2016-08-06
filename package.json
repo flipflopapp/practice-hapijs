@@ -9,10 +9,12 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.0.1"
   },
   "dependencies": {
     "hapi": "^14.1.0",
-    "mongoose": "^4.5.8"
+    "mongoose": "^4.5.8",
     "good": "^7.0.1",
     "good-console": "^6.1.2",
     "good-file": "^6.0.1",
