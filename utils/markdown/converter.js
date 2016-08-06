@@ -12,6 +12,7 @@ function parseBlock(markdown) {
     let lines = markdown.split(/\n/);
     let result = [];
     for(let line of lines) {
+        // TODO handle empty lines
         result.push(parseLine(line));
     }
     return result.join('');
@@ -36,8 +37,97 @@ function parseLine(markdown) {
  */
 
 function parseContent(markdown) {
-    //let tags = markdown.split(\[\(*\)\|\(_\)\|\(**\)\);
-    return markdown;
+    if (typeof markdown === 'string') {
+        markdown = Array.from(tokenizeMarkdownLine(markdown));
+    }
+    let doms = [];
+    
+    function isStyleElement(elem) {
+        return (elem === '*' || elem === '**' || elem === '_'); 
+    }
+
+    function addDom(type, content) {
+        if(!type) { // text
+            doms = doms.concat(content);
+        } else if (type === '*' || type === '_') { // italics
+            doms.push( new Italics(content) );
+        } else if (type === '**') { // bold
+            doms.push( new Bold(content) );
+        }
+    }
+
+    let seperator = null;
+    let content = [];
+
+    for(let elem of markdown) {
+        if(!isStyleElement(elem) || (seperator != null && seperator != elem)) { // if its text or a nested seperator
+            content.push(elem);
+        } else { // at closing or starting of a style element
+            if (content.length > 0) {
+                addDom(seperator, content)
+                content = []; // reset
+            }
+            seperator = (!seperator) ? (elem) : null; // starting of a sepertor or ending
+        }
+    };
+
+    if (content.length > 0) {
+        addDom(null, content)
+    }
+
+    return doms;
+}
+
+const MARKDOWN_ESCAPE = /(\\[*\|_])/;
+const MARKDOWN_LINK = /(\[[^\]]+\]\([^\)]+\))/;
+const MARKDOWN_BOLD = /(\*\*)/;
+const MARKDOWN_ITALICS = /([\_\|\*])/;
+
+function* tokenizeMarkdownLine(markdown) {
+    yield* tokenizeEscape(markdown);
+}
+
+function* tokenizeEscape(markdown) {
+    let tokens = markdown.split(MARKDOWN_ESCAPE).filter(item => item != '');
+    for(let item of tokens) {
+        if(item.match(MARKDOWN_ESCAPE)) {
+            yield new Escape(item);
+        } else {
+            yield* tokenizeLinks(item);
+        }
+    }
+}
+
+function* tokenizeLinks(markdown) {
+    // first get all the links
+    let tokens = markdown.split(MARKDOWN_LINK).filter(item => item != '');
+    for(let item of tokens) {
+        if(item.match(MARKDOWN_LINK)) {
+            yield new Link(item);
+        } else {
+            yield* tokenizeBolds(item);
+        }
+    }
+}
+
+function* tokenizeBolds(markdown) {
+    // split all bolds
+    let tokens = markdown.split(MARKDOWN_BOLD).filter(item => item != '');
+    for(let item of tokens) {
+        if(item.match(MARKDOWN_BOLD)) {
+            yield item;
+        } else {
+            yield* tokenizeItalics(item);
+        }
+    }
+}
+
+function* tokenizeItalics(markdown) {
+    // split all italics 
+    let tokens = markdown.split(MARKDOWN_ITALICS).filter(item => item != '');
+    for(let item of tokens) {
+        yield item;
+    }
 }
 
 /* Markdown to DOMs
@@ -67,7 +157,7 @@ class Dom {
                 if (typeof dom === 'string') {
                     result += dom;
                 } else if (typeof dom === 'object') {
-                    result += dom.toHtml();
+                    result += dom.toString();
                 }
             }
         }
@@ -103,5 +193,49 @@ class Header extends Dom {
 
     toString() {
         return super.toHtml();
+    }
+}
+
+class Italics extends Dom {
+    constructor(raw) {
+        let contents = parseContent(raw);
+        super('i', null, contents);
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+}
+
+class Bold extends Dom {
+    constructor(raw) {
+        let contents = parseContent(raw);
+        super('b', null, contents);
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+}
+
+class Link extends Dom {
+    constructor(raw) {
+        let [rawTitle, link] = raw.slice(1,-1).split(  /\]\(/ );
+        let title = parseContent(rawTitle);
+        super('a', { href: link }, title);
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+}
+
+class Escape {
+    constructor(raw) {
+        this.escape = raw[1];
+    }
+
+    toString() {
+        return this.escape;
     }
 }
