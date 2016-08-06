@@ -11,13 +11,6 @@ server.connection({
     port: process.env.SERVER_PORT || 3000
 });
 
-// API logging
-/*
-server.on('response', function (request) {
-    console.log(request.info.remoteAddress + ': ' + request.method.toUpperCase() + ' ' + request.url.path + ' --> ' + request.response.statusCode);
-});
-*/
-
 // setup mongo
 
 const mongoose = require('mongoose');
@@ -60,5 +53,5 @@ server.register(
 // if env is test - expose db
 
 if (process.env.NODE_ENV == 'test') {
-    module.exports = { db };
+    module.exports = { server, db };
 }
