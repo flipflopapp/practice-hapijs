@@ -162,7 +162,28 @@ function* tokenizeEmphasis(markdown) {
     }
 }
 
-/* Markdown to DOMs
+/* Markdown to DOM convestion
+ */
+
+/** Helper function for avoiding HTML reserved characters in output
+ */
+
+const entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+  };
+
+ function escapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s];
+    });
+ }
+
+/** Represet the HTML as doms
  */
 
 class Dom {
@@ -191,7 +212,7 @@ class Dom {
         if(this.contents) {
             for(let dom of this.contents) {
                 if (typeof dom === 'string') {
-                    result += dom;
+                    result += escapeHtml(dom);
                 } else if (typeof dom === 'object') {
                     result += dom.toString();
                 }
@@ -210,12 +231,15 @@ class Dom {
     appendChild(child) {
         this.contents.push(child);
     }
+
+    escapeHtml(str) {
+    }
 }
 
 class Paragraph extends Dom {
     constructor(raw) {
         //console.log(`Paragraph ${raw}`);
-        let contents = parseContent(raw);
+        let contents = parseContent(raw.trim());
         super('p', null, contents);
     }
 
