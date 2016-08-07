@@ -1,35 +1,40 @@
 'use strict';
 
 module.exports = (markdown) => {
-    return parseBlock(markdown);
+    let iterator = parseBlock(markdown);
+    let result = [];
+    let cache = [];
+    for(let dom of iterator) {
+        result.push(dom);
+    }
+
+    return result.join('\n');
 }
 
 
 /** Parsing a markdown
  */
 
-function parseBlock(markdown) {
+function* parseBlock(markdown) {
     let lines = markdown.split(/\n/).filter(line => line != '');
-    let result = [];
     for(let line of lines) {
         // TODO handle empty lines
-        result.push(parseLine(line));
+        yield* parseLine(line);
     }
-    return result.join('\n');
 }
 
 /** Either a markdown line is a header line or a paragraph
  */
 
-function parseLine(markdown) {
+function* parseLine(markdown) {
     if (markdown.match(Header.regex)) {
-        return new Header(markdown);
+        yield new Header(markdown);
     } else if (markdown.match(LineBreak.regex)) {
-        return new LineBreak();
+        yield new LineBreak();
     } else if (markdown.match(BlockQuote.regex)) {
-        return new BlockQuote(markdown);
+        yield new BlockQuote(markdown);
     } else {
-        return new Paragraph(markdown);
+        yield new Paragraph(markdown);
     }
 }
 
