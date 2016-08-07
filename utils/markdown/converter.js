@@ -153,9 +153,9 @@ class Dom {
         // opening tag
         let result = `<${this.tag}`;
         if (this.params) {
-            for(let key in params) {
-                let val = params[key];
-                result += ` ${key}=${val}`;
+            for(let key in this.params) {
+                let val = this.params[key];
+                result += ` ${key}=\"${val}\"`;
             }
         }
         result += '>';

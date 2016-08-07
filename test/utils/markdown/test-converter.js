@@ -34,5 +34,16 @@ describe('test markdown to html conversion', () => {
         done();
     });
 
+    it('tests links', (done) => {
+        let errs = [];
+        for(let [markdown, expect] of testdata.links) {
+            const result = convert(markdown).toString();
+            if (expect !== result) {
+                errs.push( ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
+            }
+        }
+        assert(errs.length === 0, new Error(errs.join('\n.\n')));
+        done();
+    });
 
 });
