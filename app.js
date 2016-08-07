@@ -15,7 +15,7 @@ server.connection({
 
 const mongoose = require('mongoose');
 
-const DB_URI = "mongodb://localhost:27017/markdown"; // TODO use config
+const DB_URI = process.env.DB_URI || "mongodb://localhost:27017/markdown"; 
 
 mongoose.connect(DB_URI);
 
