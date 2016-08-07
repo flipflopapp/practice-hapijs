@@ -28,3 +28,4 @@ exports.links = [
 [ 'see [Wikipedia](http://en.wikipedia.org/wiki/Markdown)', '<p>see <a href="http://en.wikipedia.org/wiki/Markdown">Wikipedia</a></p>' ],
 [ 'see [Wikipedia](http://en.wikipedia.org/wiki/Markdown) or [Github](https://help.github.com/articles/basic-writing-and-formatting-syntax/)', '<p>see <a href="http://en.wikipedia.org/wiki/Markdown">Wikipedia</a> or <a href="https://help.github.com/articles/basic-writing-and-formatting-syntax/">Github</a></p>' ]
 ];
+

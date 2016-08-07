@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs');
 const assert = require('assert');
 const path = require('path');
 
@@ -43,6 +44,15 @@ describe('test markdown to html conversion', () => {
             }
         }
         assert(errs.length === 0, new Error(errs.join('\n.\n')));
+        done();
+    });
+
+    it('tests markdown easy blocks', (done) => {
+        let markdown = String(fs.readFileSync( path.join(__dirname, 'easy_block.md') ));
+        let expect = String(fs.readFileSync( path.join(__dirname, 'easy_block.html') ));
+        
+        const result = convert(markdown).toString();
+        assert(expect === result, ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
         done();
     });
 
