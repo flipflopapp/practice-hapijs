@@ -4,9 +4,9 @@ const Validator = require('./markdown-schema');
 const Controller = require('./markdown-controller');
 
 exports.register = (server, options, next) => {
+    const controller = new Controller(options.database, options.converter);
 
-    const controller = new Controller(options.database);
-
+    server.bind(controller);
     server.route([
         {
             method: 'GET',

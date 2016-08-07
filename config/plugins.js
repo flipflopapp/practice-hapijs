@@ -1,11 +1,16 @@
 'use strict';
 
 exports.register = (server, options, next) => {
+    let database = options.database;
+    
     // load plugins
     server.register([
         {
             register: require('./../plugins/markdown/markdown-routes'),
-            options
+            options: {
+                database,
+                converter: require('./../utils/markdown/converter.js')
+            }
         } 
     ], next);
 };

@@ -1,8 +1,9 @@
 'use strict';
 
-function MarkdownController(database) {
+function MarkdownController(database, converter) {
     this.database = database;
     this.model = database.Markdown;
+    this.convertToHtml = converter;
 }
 
 MarkdownController.prototype = {
@@ -11,16 +12,18 @@ MarkdownController.prototype = {
     update
 };
 
-function get(request, response) {
-    return response('get API called');
+function get(req, reply) {
+    return reply('get API called');
 }
 
-function create(request, response) {
-    return response('create API called');
+function create(req, reply) {
+    let markdown = req.payload.markdown;
+    let html = this.convertToHtml(markdown); // expensive!!
+    return reply({html});
 }
 
-function update(request, response) {
-    return response('update API called');
+function update(req, reply) {
+    return reply('update API called');
 }
 
 module.exports = MarkdownController;

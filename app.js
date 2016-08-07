@@ -44,14 +44,14 @@ server.register(
             throw err;
         }
 
-        server.start((err) => {
-            console.log(`Server started at ${server.info.uri}`);
-        });
+        if (!module.parent) {
+            server.start((err) => server.log(`Server started at ${server.info.uri}`));
+        }
     }
  );
 
 // if env is test - expose db
 
 if (process.env.NODE_ENV == 'test') {
-    module.exports = { server, db };
+    module.exports = { server, database };
 }
