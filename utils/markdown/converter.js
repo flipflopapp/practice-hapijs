@@ -231,7 +231,7 @@ class Italics extends Dom {
 class Bold extends Dom {
     constructor(raw) {
         let contents = parseContent(raw);
-        super('b', null, contents);
+        super('strong', null, contents);
     }
 
     toString() {

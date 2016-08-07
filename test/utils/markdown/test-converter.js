@@ -22,7 +22,7 @@ describe('test markdown to html conversion', () => {
         done();
     });
 
-    it('tests bold and italics formatting', (done) => {
+    it('tests paragraph formatting', (done) => {
         let errs = [];
         for(let [markdown, expect] of testdata.formatting) {
             const result = convert(markdown).toString();
@@ -33,5 +33,6 @@ describe('test markdown to html conversion', () => {
         assert(errs.length === 0, new Error(errs.join('\n.\n')));
         done();
     });
+
 
 });

@@ -7,7 +7,9 @@ exports.headers = [
 [ ' #Something', '<p> #Something</p>' ], 
 [ '##Something', '<h2>Something</h2>' ], 
 [ '### Something', '<h3>Something</h3>' ], 
-[ '####### Something', '<h7>Something</h7>' ] ];
+[ '####### Something', '<h7>Something</h7>' ],
+[ '####### _Something_', '<h7><i>Something</i></h7>' ],
+[ '####### **Something**', '<h7><strong>Something</strong></h7>' ] ];
 
 exports.formatting = [
 [ '_italics_ not', '<p><i>italics</i> not</p>' ],
@@ -16,7 +18,7 @@ exports.formatting = [
 [ '*emphasized* not', '<p><em>emphasized</em> not</p>' ],
 [ 'not * emphasized * ', '<p>not <em> emphasized </em> </p>' ],
 [ '\\*italics\\* not', '<p>*italics* not</p>' ],
-[ '**bold** not', '<p><b>bold</b> not</p>' ],
-[ 'not ** bold ** ', '<p>not <b> bold </b> </p>' ],
-[ '**bold** not', '<p><b>bold</b> not</p>' ]
+[ '**bold** not', '<p><strong>bold</strong> not</p>' ],
+[ 'not ** bold ** ', '<p>not <strong> bold </strong> </p>' ],
+[ '**bold** not', '<p><strong>bold</strong> not</p>' ]
 ]
