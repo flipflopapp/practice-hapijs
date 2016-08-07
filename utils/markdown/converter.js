@@ -3,24 +3,33 @@
 module.exports = (markdown) => {
     let iterator = parseBlock(markdown);
     let result = [];
-    let cache = [];
-    for(let dom of iterator) {
-        if(dom instanceof OrderedList) {
-            //console.log(dom);
-            cache.push(dom);
-        } else {
-            if (cache.length > 0) {
-                //console.log('end of list');
-                let wrapperDom = new OrderedListWrapper(cache);
-                result.push(wrapperDom);
-                cache = []; // reset cache
+    let dom = iterator.next();
+    while(!dom.done) {
+        if(dom.value instanceof OrderedList) {
+            let cache = [];
+            while(dom.value instanceof OrderedList) {
+                cache.push(dom.value);
+                dom = iterator.next();
             }
-
-            result.push(dom);
+            let wrapperDom = new OrderedListWrapper(cache);
+            result.push(wrapperDom);
+            continue;
         }
-    }
-    result.pop(); // pop out the last empty dom
 
+        if(dom.value instanceof UnorderedList) {
+            let cache = [];
+            while(dom.value instanceof UnorderedList) {
+                cache.push(dom.value);
+                dom = iterator.next();
+            }
+            let wrapperDom = new UnorderedListWrapper(cache);
+            result.push(wrapperDom);
+            continue;
+        }
+
+        result.push(dom.value);
+        dom = iterator.next();
+    }
     return result.join('\n');
 }
 
@@ -34,7 +43,6 @@ function* parseBlock(markdown) {
         // TODO handle empty lines
         yield* parseLine(line);
     }
-    yield; // iterator one-last time to see if a list needs to be unwrapped
 }
 
 /** Either a markdown line is a header line or a paragraph
@@ -49,8 +57,8 @@ function* parseLine(markdown) {
         yield new BlockQuote(markdown);
     } else if (markdown.match(OrderedList.regex)) {
         yield new OrderedList(markdown);
-    //} else if (markdown.match(UnorderedList.regex)) {
-    //    yield new UnorderedList(markdown);
+    } else if (markdown.match(UnorderedList.regex)) {
+        yield new UnorderedList(markdown);
     } else {
         yield new Paragraph(markdown);
     }
