@@ -23,13 +23,11 @@ function parseBlock(markdown) {
 
 function parseLine(markdown) {
     if (markdown.match(Header.regex)) {
-        markdown = markdown.split(Header.regex);
-        markdown.shift(); // first item is empty
-        var size = markdown.shift().length; // number of #s
-        var raw = markdown.shift().trim(); // content of the header
-        return new Header(size, raw);
+        return new Header(markdown);
     } else if (markdown.match(LineBreak.regex)) {
         return new LineBreak();
+    } else if (markdown.match(BlockQuote.regex)) {
+        return new BlockQuote(markdown);
     } else {
         return new Paragraph(markdown);
     }
@@ -192,13 +190,17 @@ class Paragraph extends Dom {
 }
 
 class Header extends Dom {
-    constructor(size, raw) {
-        //console.log(`Header ${size} ${raw}`);
+    constructor(raw) {
+        let parts = raw.split(Header.regex);
+        parts.shift(); // first item is empty
+        let size = parts.shift().length; // number of #s
+
+        //console.log(`Header ${size}`);
         if (size > 7) {
             throw new Error(`illegal header h${n}`);
         }
 
-        let contents = parseContent(raw);
+        let contents = parseContent( parts.shift().trim() ); // content of the header
         super(`h${size}`, null, contents);
     }
 
@@ -307,3 +309,20 @@ class LineBreak {
         return /^----/;
     }
 }
+
+class BlockQuote extends Dom {
+    constructor(raw) {
+        //console.log(`Paragraph ${raw}`);
+        let contents = [ new Paragraph(raw.slice(1)) ];
+        super('blockquote', null, contents);
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+
+    static get regex() {
+        return /^>/;
+    }
+}
+
