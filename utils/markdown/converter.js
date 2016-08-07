@@ -224,11 +224,10 @@ class Dom {
                 } else if (typeof dom === 'object') {
                     result += dom.toString();
                 }
+                if (this.expandInHtml) {
+                    result += '\n';
+                }
             }
-        }
-
-        if (this.expandInHtml) {
-            result += '\n';
         }
 
         // closing tag
@@ -401,7 +400,7 @@ class OrderedList extends Dom {
     }
 
     toString() {
-        return super.toHtml() + '\n';
+        return super.toHtml();
     }
 
     static get regex() {
