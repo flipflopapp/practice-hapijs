@@ -6,8 +6,8 @@ demo of my coding ability. This is the first time I am building a hapi
 nodejs server and have written it from scratch. The time taken to complete
 this project was about 2 days.
 
-The main goal of the project is to parse a markdown and convert it to
-equivalent html representation.
+The goal of the project is to **parse a markdown and convert it to
+equivalent html** representation.
 
 
 # Setup
