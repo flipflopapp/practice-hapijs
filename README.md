@@ -72,7 +72,7 @@ Bad Response
 * 400 for empty markdown
 
 
-### GET /markdown/get
+### GET /markdown/get/{id}
 
 Fetches an earlier saved markdown.
 
