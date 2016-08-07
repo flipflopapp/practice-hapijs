@@ -9,51 +9,51 @@ const markdown_module = path.join(process.cwd(), 'utils', 'markdown', 'converter
 const convert = require(markdown_module);
 const testdata = require('./testdata');
 
+function helperTestfn_array(testcases, done) {
+    let errs = [];
+    for(let [markdown, expect] of testcases) {
+        const result = convert(markdown).toString();
+        if (expect !== result) {
+            errs.push( ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
+        }
+    }
+    assert(errs.length === 0, new Error(errs.join('\n.\n')));
+    done();
+}
+
+function helperTestfn_file(name, done) {
+    let markdown = String(fs.readFileSync( path.join(__dirname, `${name}.md`) ));
+    let expect = String(fs.readFileSync( path.join(__dirname, `${name}.html`) )).trim();
+    
+    const result = convert(markdown).toString().trim();
+    assert(expect === result, ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
+    done();
+}
+
 describe('test markdown to html conversion', () => {
 
     it('tests headings', (done) => {
-        let errs = [];
-        for(let [markdown, expect] of testdata.headers) {
-            const result = convert(markdown).toString();
-            if (expect !== result) {
-                errs.push( ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
-            }
-        }
-        assert(errs.length === 0, new Error(errs.join('\n.\n')));
-        done();
+        helperTestfn_array(testdata.headers, done);
     });
 
     it('tests paragraph formatting', (done) => {
-        let errs = [];
-        for(let [markdown, expect] of testdata.formatting) {
-            const result = convert(markdown).toString();
-            if (expect !== result) {
-                errs.push( ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
-            }
-        }
-        assert(errs.length === 0, new Error(errs.join('\n.\n')));
-        done();
+        helperTestfn_array(testdata.formatting, done);
     });
 
     it('tests links', (done) => {
-        let errs = [];
-        for(let [markdown, expect] of testdata.links) {
-            const result = convert(markdown).toString();
-            if (expect !== result) {
-                errs.push( ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
-            }
-        }
-        assert(errs.length === 0, new Error(errs.join('\n.\n')));
-        done();
+        helperTestfn_array(testdata.links, done);
     });
 
     it('tests markdown easy block', (done) => {
-        let markdown = String(fs.readFileSync( path.join(__dirname, 'easy_block.md') ));
-        let expect = String(fs.readFileSync( path.join(__dirname, 'easy_block.html') ));
-        
-        const result = convert(markdown).toString();
-        assert(expect !== result, ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
-        done();
+        helperTestfn_file('easy_block', done);
+    });
+    
+    it('tests markdown lists block', (done) => {
+        helperTestfn_file('list_block', done);
+    });
+
+    it('tests markdown hard block', (done) => {
+        helperTestfn_file('hard_block', done);
     });
 
 });
