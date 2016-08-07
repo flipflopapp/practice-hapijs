@@ -11,7 +11,7 @@ describe("test api /markdown", () => {
         it("valid requests", (done) => {
             let testdata = { md: '## header', html: '<h2>header</h2>' };
             agent
-            .post('/markdown')
+            .post('/markdown/save')
             .field('markdown', testdata.md)
             .expect(201)
             .then(res => {
@@ -28,14 +28,14 @@ describe("test api /markdown", () => {
 
         it("invalid requests - no 'markdown' field", (done) => {
             agent
-            .post('/markdown')
+            .post('/markdown/save')
             .expect(400)
             .end(done);
         })
         
         it("invalid requests - empty markdown field", (done) => { 
             agent
-            .post('/markdown')
+            .post('/markdown/save')
             .field('markdown', '')
             .expect(400)
             .end(done);
@@ -50,7 +50,7 @@ describe("test api /markdown", () => {
         before((done) => {
             let testdata = { md: '## header', html: '<h2>header</h2>' };
             agent
-            .post('/markdown')
+            .post('/markdown/save')
             .field('markdown', testdata.md)
             .expect(201)
             .then(res => {
@@ -62,7 +62,7 @@ describe("test api /markdown", () => {
         
         it("valid requests", (done) => {
             agent
-            .get(`/markdown/${response._id}`)
+            .get(`/markdown/get/${response._id}`)
             .expect(200)
             .then((res) => {
                 const body = res.body;
@@ -78,7 +78,7 @@ describe("test api /markdown", () => {
 
         it("invalid requests", (done) => {
             agent
-            .get(`/markdown/${response._id}*`) // added a '*' to id
+            .get(`/markdown/get/${response._id}*`) // added a '*' to id
             .expect(400)
             .end(done);
         });

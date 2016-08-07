@@ -10,7 +10,7 @@ exports.register = (server, options, next) => {
     server.route([
         {
             method: 'GET',
-            path: '/markdown/{id}',
+            path: '/markdown/get/{id}',
             config: {
                 handler: controller.get,
                 validate: Validator.get()
@@ -18,20 +18,20 @@ exports.register = (server, options, next) => {
         },
         {
             method: 'POST',
-            path: '/markdown',
+            path: '/markdown/save',
             config: {
                 handler: controller.create,
                 validate: Validator.create()
             }
-        },
+        } /*,
         {
             method: ['PATCH', 'POST', 'PUT'],
-            path: '/markdown/{id}',
+            path: '/markdown{id}',
             config: {
                 handler: controller.update,
                 validate: Validator.update()
             }
-        }
+        } */
     ]);
 
     next();
