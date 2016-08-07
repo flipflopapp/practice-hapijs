@@ -23,7 +23,7 @@ function parseBlock(markdown) {
 
 function parseLine(markdown) {
     if (markdown[0] === '#') {
-        markdown = markdown.split(/^(#{1,7})/);
+        markdown = markdown.split(Header.regex);
         markdown.shift(); // first item is empty
         var size = markdown.shift().length; // number of #s
         var raw = markdown.shift().trim(); // content of the header
@@ -49,9 +49,11 @@ function parseContent(markdown) {
     function addDom(type, content) {
         if(!type) { // text
             doms = doms.concat(content);
-        } else if (type === '*' || type === '_') { // italics
+        } else if (type === Italics.marker) { // italics
             doms.push( new Italics(content) );
-        } else if (type === '**') { // bold
+        } else if (type === Emphasis.marker) {
+            doms.push( new Emphasis(content) );
+        } else if (type === Bold.marker) { // bold
             doms.push( new Bold(content) );
         }
     }
@@ -78,19 +80,17 @@ function parseContent(markdown) {
     return doms;
 }
 
-const MARKDOWN_ESCAPE = /(\\[*\|_])/;
-const MARKDOWN_LINK = /(\[[^\]]+\]\([^\)]+\))/;
-const MARKDOWN_BOLD = /(\*\*)/;
-const MARKDOWN_ITALICS = /([\_\|\*])/;
+/** tokenize a markdown line
+ */
 
 function* tokenizeMarkdownLine(markdown) {
     yield* tokenizeEscape(markdown);
 }
 
 function* tokenizeEscape(markdown) {
-    let tokens = markdown.split(MARKDOWN_ESCAPE).filter(item => item != '');
+    let tokens = markdown.split(Escape.regex).filter(item => item != '');
     for(let item of tokens) {
-        if(item.match(MARKDOWN_ESCAPE)) {
+        if(item.match(Escape.regex)) {
             yield new Escape(item);
         } else {
             yield* tokenizeLinks(item);
@@ -100,9 +100,9 @@ function* tokenizeEscape(markdown) {
 
 function* tokenizeLinks(markdown) {
     // first get all the links
-    let tokens = markdown.split(MARKDOWN_LINK).filter(item => item != '');
+    let tokens = markdown.split(Link.regex).filter(item => item != '');
     for(let item of tokens) {
-        if(item.match(MARKDOWN_LINK)) {
+        if(item.match(Link.regex)) {
             yield new Link(item);
         } else {
             yield* tokenizeBolds(item);
@@ -112,9 +112,9 @@ function* tokenizeLinks(markdown) {
 
 function* tokenizeBolds(markdown) {
     // split all bolds
-    let tokens = markdown.split(MARKDOWN_BOLD).filter(item => item != '');
+    let tokens = markdown.split(Bold.regex).filter(item => item != '');
     for(let item of tokens) {
-        if(item.match(MARKDOWN_BOLD)) {
+        if(item.match(Bold.regex)) {
             yield item;
         } else {
             yield* tokenizeItalics(item);
@@ -124,7 +124,16 @@ function* tokenizeBolds(markdown) {
 
 function* tokenizeItalics(markdown) {
     // split all italics 
-    let tokens = markdown.split(MARKDOWN_ITALICS).filter(item => item != '');
+    let tokens = markdown.split(Italics.regex).filter(item => item != '');
+    for(let item of tokens) {
+        yield* tokenizeEmphasis(item);
+    }
+}
+
+
+function* tokenizeEmphasis(markdown) {
+    // split all italics 
+    let tokens = markdown.split(Emphasis.regex).filter(item => item != '');
     for(let item of tokens) {
         yield item;
     }
@@ -194,6 +203,10 @@ class Header extends Dom {
     toString() {
         return super.toHtml();
     }
+
+    static get regex() {
+        return /^(#{1,7})/;
+    }
 }
 
 class Italics extends Dom {
@@ -205,6 +218,14 @@ class Italics extends Dom {
     toString() {
         return super.toHtml();
     }
+
+    static get regex() {
+        return /(\_)/;
+    }
+
+    static get marker() {
+        return '_';
+    }
 }
 
 class Bold extends Dom {
@@ -215,6 +236,33 @@ class Bold extends Dom {
 
     toString() {
         return super.toHtml();
+    }
+
+    static get regex() {
+        return /(\*\*)/;
+    }
+
+    static get marker() {
+        return '**';
+    }
+}
+
+class Emphasis extends Dom {
+    constructor(raw) {
+        let contents = parseContent(raw);
+        super('em', null, contents);
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+    
+    static get regex() {
+        return /(\*)/;
+    }
+
+    static get marker() {
+        return '*';
     }
 }
 
@@ -228,6 +276,10 @@ class Link extends Dom {
     toString() {
         return super.toHtml();
     }
+    
+    static get regex() {
+        return /(\[[^\]]+\]\([^\)]+\))/;
+    }
 }
 
 class Escape {
@@ -237,5 +289,9 @@ class Escape {
 
     toString() {
         return this.escape;
+    }
+    
+    static get regex() {
+        return /(\\[*\|_])/;
     }
 }
