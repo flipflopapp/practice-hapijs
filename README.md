@@ -47,3 +47,48 @@ export DB_URI=mongodb://user:password@host:port/database
 ```
 npm start
 ```
+
+# Details
+
+## API specifications
+
+### POST /markdown/save
+
+Converts a markdown into HTML and saves it.
+
+Request
+```
+markdown - a markdown document as a string
+```
+
+Success Response - 201
+```
+_id - unique id for created resource
+html - newly generated html
+markdown - same as the request field markdown
+```
+
+Bad Response
+* 400 for empty markdown
+
+
+### GET /markdown/get
+
+Fetches an earlier saved markdown.
+
+Request
+```
+_id - id of the markdown resource
+```
+
+Success Response - 200
+```
+_id - unique id for created resource
+html - newly generated html
+markdown - same as the request field markdown
+```
+
+Bad Response
+* 400 for invalid _id
+
+
