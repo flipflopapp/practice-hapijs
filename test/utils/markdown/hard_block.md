@@ -23,5 +23,8 @@ see [Wikipedia](http://en.wikipedia.org/wiki/Markdown)
 
 >block quote
 
-    code (4 spaces indent)
-    [links](http://wikipedia.org)
+    code line1 (4 spaces indent)
+    code line2
+    code line3
+
+[links](http://wikipedia.org/)

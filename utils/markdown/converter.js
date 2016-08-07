@@ -27,6 +27,17 @@ module.exports = (markdown) => {
             continue;
         }
 
+        if(dom.value instanceof Code) {
+            let cache = [];
+            while(dom.value instanceof Code) {
+                cache.push(dom.value);
+                dom = iterator.next();
+            }
+            let wrapperDom = new CodeWrapper(cache);
+            result.push(wrapperDom);
+            continue;
+        }
+
         result.push(dom.value);
         dom = iterator.next();
     }
@@ -59,6 +70,8 @@ function* parseLine(markdown) {
         yield new OrderedList(markdown);
     } else if (markdown.match(UnorderedList.regex)) {
         yield new UnorderedList(markdown);
+    } else if (markdown.match(Code.regex)) {
+        yield new Code(markdown);
     } else {
         yield new Paragraph(markdown);
     }
@@ -450,3 +463,31 @@ class UnorderedListWrapper extends Dom {
     }
 }
 
+class Code extends Dom {
+    constructor(raw) {
+        let parts = raw.split(Code.regex);
+        parts.shift(); // first one is empty
+        parts.shift(); // ignore leading spaces
+        let content = parts.shift();
+        super('code', null, content);
+    }
+
+    static get regex() {
+        return /^(    )/;
+    }
+}
+
+class CodeWrapper {
+    constructor(contents) {
+        this.contents = contents;
+    }
+
+    toString() {
+        let result = '<pre><code>';
+        for(let code of this.contents) {
+            result += `${code.contents}\n`;
+        }
+        result += '</code></pre>';
+        return result;
+    }
+}
