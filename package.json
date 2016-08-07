@@ -4,7 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha test/utils/markdown/test-converter.js"
+    "start": "node app",
+    "test": "npm run test-api && npm run test-converter",
+    "test-converter": "NODE_ENV=test mocha test/utils/markdown/converter.js",
+    "test-api": "NODE_ENV=test mocha test/api/markdown.js"
   },
   "author": "",
   "license": "ISC",
