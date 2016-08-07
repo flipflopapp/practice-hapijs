@@ -47,12 +47,12 @@ describe('test markdown to html conversion', () => {
         done();
     });
 
-    it('tests markdown easy blocks', (done) => {
+    it('tests markdown easy block', (done) => {
         let markdown = String(fs.readFileSync( path.join(__dirname, 'easy_block.md') ));
         let expect = String(fs.readFileSync( path.join(__dirname, 'easy_block.html') ));
         
         const result = convert(markdown).toString();
-        assert(expect === result, ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
+        assert(expect !== result, ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
         done();
     });
 

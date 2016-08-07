@@ -9,25 +9,27 @@ module.exports = (markdown) => {
  */
 
 function parseBlock(markdown) {
-    let lines = markdown.split(/\n/);
+    let lines = markdown.split(/\n/).filter(line => line != '');
     let result = [];
     for(let line of lines) {
         // TODO handle empty lines
         result.push(parseLine(line));
     }
-    return result.join('');
+    return result.join('\n');
 }
 
 /** Either a markdown line is a header line or a paragraph
  */
 
 function parseLine(markdown) {
-    if (markdown[0] === '#') {
+    if (markdown.match(Header.regex)) {
         markdown = markdown.split(Header.regex);
         markdown.shift(); // first item is empty
         var size = markdown.shift().length; // number of #s
         var raw = markdown.shift().trim(); // content of the header
         return new Header(size, raw);
+    } else if (markdown.match(LineBreak.regex)) {
+        return new LineBreak();
     } else {
         return new Paragraph(markdown);
     }
@@ -293,5 +295,15 @@ class Escape {
     
     static get regex() {
         return /(\\[*\|_])/;
+    }
+}
+
+class LineBreak {
+    toString() {
+        return '<hr>';
+    }
+
+    static get regex() {
+        return /^----/;
     }
 }
