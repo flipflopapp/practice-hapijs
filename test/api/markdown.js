@@ -24,14 +24,14 @@ describe("test api /markdown", () => {
                 done();
             })
             .catch(done);
-        });
+        })
 
         it("invalid requests - no 'markdown' field", (done) => {
             agent
             .post('/markdown')
             .expect(400)
             .end(done);
-        });
+        })
         
         it("invalid requests - empty markdown field", (done) => { 
             agent
@@ -39,25 +39,46 @@ describe("test api /markdown", () => {
             .field('markdown', '')
             .expect(400)
             .end(done);
-        });
+        })
         
-    });
+    })
     
     describe("test GET call", () => {
+
+        let response;
+
+        before((done) => {
+            let testdata = { md: '## header', html: '<h2>header</h2>' };
+            agent
+            .post('/markdown')
+            .field('markdown', testdata.md)
+            .expect(201)
+            .then(res => {
+                response = res.body;
+                done();
+            })
+            .catch(done);
+        })
         
         it("valid requests", (done) => {
             agent
-            .get('/markdown/1')
+            .get(`/markdown/${response._id}`)
             .expect(200)
             .then((res) => {
-                done(null, res);
+                const body = res.body;
+                body._id.should.equal(response._id);
+                body.__v.should.equal(response.__v);
+                body.html.should.equal(response.html);
+                body.markdown.should.equal(response.markdown);
+                body.createdOn.should.equal(response.createdOn);
+                done();
             })
             .catch(done);
         });
 
         it("invalid requests", (done) => {
             agent
-            .get('/markdown/1!%^&2') // invalid id 
+            .get(`/markdown/${response._id}*`) // added a '*' to id
             .expect(400)
             .end(done);
         });

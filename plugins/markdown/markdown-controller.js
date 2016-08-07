@@ -13,7 +13,15 @@ MarkdownController.prototype = {
 };
 
 function get(req, reply) {
-    return reply('get API called');
+    let _id = req.params.id;
+
+    this.model.findOneAsync({ _id })
+    .then(doc => {
+        reply(doc).code(200);
+    })
+    .catch(err => {
+        reply.badImplementation(err.message);
+    });
 }
 
 function create(req, reply) {
@@ -22,10 +30,10 @@ function create(req, reply) {
 
     this.model
     .createAsync({ markdown, html })
-    .then((obj) => {
-        reply(obj).code(201);
+    .then(doc => {
+        reply(doc).code(201);
     })
-    .catch((err) => {
+    .catch(err => {
         reply.badImplementation(err.message);
     });
 }
