@@ -25,11 +25,3 @@ see [Wikipedia](http://en.wikipedia.org/wiki/Markdown)
 
     code (4 spaces indent)
     [links](http://wikipedia.org)
-
-    ----
-## changelog
-    * 17-Feb-2013 re-design
-
-    ----
-## thanks
-    * [markdown-js](https://github.com/evilstreak/markdown-js)
