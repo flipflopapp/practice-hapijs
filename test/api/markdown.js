@@ -1,8 +1,8 @@
 const should = require('should');
 const path = require('path');
 
-const app = require( path.join(process.cwd(), 'app.js') );
-const agent = require('supertest-as-promised').agent(app.server.listener);
+const { server, database } = require( path.join(process.cwd(), 'app.js') );
+const agent = require('supertest-as-promised').agent(server.listener);
 
 describe("test api /markdown", () => {
 
@@ -13,11 +13,17 @@ describe("test api /markdown", () => {
             agent
             .post('/markdown')
             .field('markdown', testdata.md)
-            .expect(200)
+            .expect(201)
             .then(res => {
-                res.body.html.should.equal(testdata.html);
+                res.body.html.should.equal(testdata.html, `incorrect html returned - ${res.body.html}`);
+                should.exist(res.body._id, 'markdown _id is null');
+                return database.Markdown.findOneAsync({_id: res.body._id});
+            })
+            .then(doc => {
+                should.exist(doc, 'markdown was not saved in database');
                 done();
-            });
+            })
+            .catch(done);
         });
 
         it("invalid requests - no 'markdown' field", (done) => {

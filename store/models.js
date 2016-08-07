@@ -9,7 +9,7 @@ const MarkdownModel = mongoose.model('Markdown',
     new mongoose.Schema({
         markdown: String,
         html: String,
-        createdOn: Date
+        createdOn: { type: Date, default: Date.now }
     })
   );
 

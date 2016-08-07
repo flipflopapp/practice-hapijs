@@ -19,7 +19,15 @@ function get(req, reply) {
 function create(req, reply) {
     let markdown = req.payload.markdown;
     let html = this.convertToHtml(markdown); // expensive!!
-    return reply({html});
+
+    this.model
+    .createAsync({ markdown, html })
+    .then((obj) => {
+        reply(obj).code(201);
+    })
+    .catch((err) => {
+        reply.badImplementation(err.message);
+    });
 }
 
 function update(req, reply) {
