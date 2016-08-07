@@ -5,8 +5,21 @@ module.exports = (markdown) => {
     let result = [];
     let cache = [];
     for(let dom of iterator) {
-        result.push(dom);
+        if(dom instanceof OrderedList) {
+            //console.log(dom);
+            cache.push(dom);
+        } else {
+            if (cache.length > 0) {
+                //console.log('end of list');
+                let wrapperDom = new OrderedListWrapper(cache);
+                result.push(wrapperDom);
+                cache = []; // reset cache
+            }
+
+            result.push(dom);
+        }
     }
+    result.pop(); // pop out the last empty dom
 
     return result.join('\n');
 }
@@ -21,6 +34,7 @@ function* parseBlock(markdown) {
         // TODO handle empty lines
         yield* parseLine(line);
     }
+    yield; // iterator one-last time to see if a list needs to be unwrapped
 }
 
 /** Either a markdown line is a header line or a paragraph
@@ -33,6 +47,10 @@ function* parseLine(markdown) {
         yield new LineBreak();
     } else if (markdown.match(BlockQuote.regex)) {
         yield new BlockQuote(markdown);
+    } else if (markdown.match(OrderedList.regex)) {
+        yield new OrderedList(markdown);
+    //} else if (markdown.match(UnorderedList.regex)) {
+    //    yield new UnorderedList(markdown);
     } else {
         yield new Paragraph(markdown);
     }
@@ -165,6 +183,10 @@ class Dom {
         }
         result += '>';
 
+        if (this.expandInHtml) { // comes from child class
+            result += '\n';
+        }
+
         // content
         if(this.contents) {
             for(let dom of this.contents) {
@@ -176,9 +198,17 @@ class Dom {
             }
         }
 
+        if (this.expandInHtml) {
+            result += '\n';
+        }
+
         // closing tag
         result += `</${this.tag}>`;
         return result;
+    }
+
+    appendChild(child) {
+        this.contents.push(child);
     }
 }
 
@@ -320,6 +350,7 @@ class BlockQuote extends Dom {
         //console.log(`Paragraph ${raw}`);
         let contents = [ new Paragraph(raw.slice(1)) ];
         super('blockquote', null, contents);
+        this.expandInHtml = true;
     }
 
     toString() {
@@ -328,6 +359,63 @@ class BlockQuote extends Dom {
 
     static get regex() {
         return /^>/;
+    }
+}
+
+class OrderedList extends Dom {
+    constructor(raw) {
+        let contents = raw.replace(OrderedList.regex, '');
+        super('li', null, contents);
+    }
+
+    toString() {
+        return super.toHtml() + '\n';
+    }
+
+    static get regex() {
+        return /^([0-9]+. )/;
+    }
+}
+
+class OrderedListWrapper extends Dom {
+    constructor(contents) {
+        super('ol', null, contents);
+        this.expandInHtml = true;
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+}
+
+class UnorderedList extends Dom {
+    constructor(raw) {
+        let parts = raw.split(UnorderedList.regex);
+        parts.shift(); // first one is empty
+        let subCount = parts.shift().trim().length; // number of bullets '*'
+        let contents = parts.shift(); // contents
+
+        super('li', null, contents);
+        this.subCount = subCount;
+    }
+
+    toString() {
+        return super.toHtml();
+    }
+
+    static get regex() {
+        return /^([*]+ )/;
+    }
+}
+
+class UnorderedListWrapper extends Dom {
+    constructor(contents) {
+        super('ul', null, contents);
+        this.expandInHtml = true;
+    }
+
+    toString() {
+        return super.toHtml();
     }
 }
 

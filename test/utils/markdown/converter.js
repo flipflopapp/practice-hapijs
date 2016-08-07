@@ -14,7 +14,7 @@ function helperTestfn_array(testcases, done) {
     for(let [markdown, expect] of testcases) {
         const result = convert(markdown).toString();
         if (expect !== result) {
-            errs.push( ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
+            errs.push( ['\nExpected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
         }
     }
     assert(errs.length === 0, new Error(errs.join('\n.\n')));
@@ -26,7 +26,7 @@ function helperTestfn_file(name, done) {
     let expect = String(fs.readFileSync( path.join(__dirname, `${name}.html`) )).trim();
     
     const result = convert(markdown).toString().trim();
-    assert(expect === result, ['Expected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
+    assert(expect === result, ['\nExpected: ', expect, 'Actual: ', result, 'Markdown: ', markdown].join('\n') );
     done();
 }
 
