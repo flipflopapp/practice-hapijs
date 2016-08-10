@@ -25,7 +25,7 @@ function create() {
             markdown: Joi
                 .string()
                 .min(1)
-                .max(2048) // max size
+                .max(8192) // max size
                 .trim()
                 .required()
         }
